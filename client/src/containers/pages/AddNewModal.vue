@@ -51,7 +51,6 @@ export default {
   },
   methods: {
     addNewItem() {
-      console.log("adding item : ", this.newItem);
       MicroPostsService.insertMicroPost(this.newItem.name, 'TEST', this.newItem.price, this.newItem.category)
         .then((data) => {
           console.log(data);

@@ -1,6 +1,7 @@
 import axios from 'axios'
-
-const url = 'http://localhost:8081/micro-posts/'
+import {apiUrl} from "../constants/config";
+// const url = process.env.BACKEND_URL
+const url = apiUrl;
 
 class MicroPostsService {
   static getMicroPosts () {
@@ -8,6 +9,8 @@ class MicroPostsService {
       try {
         const serverResponse = await axios.get(url)
         const unparsedData = serverResponse.data
+        console.log(unparsedData);
+
         resolve(unparsedData.map(microPost => ({
           ...microPost,
           createdAt: new Date(microPost.createdAt)

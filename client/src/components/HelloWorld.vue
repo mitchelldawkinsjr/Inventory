@@ -44,11 +44,9 @@ export default {
   },
   methods : {
     calculate(obj) {
-      console.log(obj);
       Object.values(obj).forEach(value=>{
-        console.log(parseInt(value.price));
         let val = parseInt(value.price);
-        if(!isNaN(val)) { this.totalDollarValue += val; }
+        if(!isNaN(val)) {this.totalDollarValue += val;}
       });
       this.totalDollarValue = '$' + this.totalDollarValue
     }

@@ -182,7 +182,8 @@
         );
       },
       apiUrl() {
-        return `${this.apiBase}?sort=${this.sort.column}&page=${this.page}&per_page=${this.perPage}&search=${this.search}`;
+        // return `${this.apiBase}?sort=${this.sort.column}&page=${this.page}&per_page=${this.perPage}&search=${this.search}`;
+        return `${this.apiBase}`;
       }
     },
     watch: {

@@ -25,8 +25,9 @@ export const firebaseConfig = {
 };
 
 
-// export const apiUrl = 'https://api.coloredstrategies.com'
-export const apiUrl = 'http://localhost:8081/micro-posts/'
+export const apiUrl = 'https://259gz4ahbg.execute-api.us-east-1.amazonaws.com/latest/micro-posts/'
+// export const apiUrl = 'http://localhost:8081/micro-posts/'
+export const appUrl = 'http://revolution-inventory.s3-website-us-east-1.amazonaws.com'
 
 export const currentUser = {
   id: 1,

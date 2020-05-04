@@ -12,7 +12,7 @@ export default {
   props: {
     title: { type: String, default: 'icon-card-title' },
     icon: { type: String, default: 'iconsminds-clock' },
-    value: { type: String, default: 0 }
+    value: { default: '' }
   }
 }
 </script>
