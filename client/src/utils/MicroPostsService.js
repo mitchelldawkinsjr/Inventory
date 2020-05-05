@@ -9,7 +9,6 @@ class MicroPostsService {
       try {
         const serverResponse = await axios.get(url)
         const unparsedData = serverResponse.data
-        console.log(unparsedData);
 
         resolve(unparsedData.map(microPost => ({
           ...microPost,
@@ -27,6 +26,30 @@ class MicroPostsService {
       image,
       price
     })
+  }
+
+  static saveImage (file) {
+
+    let params = {
+      name: file.name,
+      data: file.dataURL
+    }
+    console.log(params);
+
+    return axios.put(url, params)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(err);
+      });
+
+    // return url;
+  }
+
+  static signedUpload (params) {
+    //path to S3 signature
+
   }
 }
 

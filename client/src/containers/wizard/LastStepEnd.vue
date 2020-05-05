@@ -51,6 +51,8 @@ import FormWizard from "../../components/Form/Wizard/FormWizard";
 import Tab from "../../components/Form/Wizard/Tab";
 import VueDropzone from "vue2-dropzone";
 import MicroPostsService from "../../utils/MicroPostsService";
+import axios from "axios";
+import {apiUrl} from "../../constants/config";
 
 export default {
   data() {
@@ -58,13 +60,68 @@ export default {
       name:'',
       price: '',
       dropzoneOptions: {
-        url: "https://httpbin.org/post",
-        thumbnailHeight: 160,
-        maxFilesize: 2,
+        url:"#",
         previewTemplate: this.dropzoneTemplate(),
-        headers: {
-          "My-Awesome-Header": "header value"
+        method: "PUT",
+        uploadMultiple: false,
+        paramName: "file",
+        maxFiles: 10,
+        thumbnailWidth: 80,
+        thumbnailHeight: 80,
+        parallelUploads: 20,
+        autoProcessQueue: true,
+        //autoQueue: false, // Make sure the files aren't queued until manually added
+        //clickable: true, //".fileinput-button" // Define the element that should be used as click trigger to select files.
+        accept: function(file, cb) {
+          //override the file name, to use the s3 signature
+          //console.log(file);
+          var params = {
+            fileName: file.name,
+            fileType: file.type,
+          };
+
+          axios.get(apiUrl+'uploader', params)
+            .then(function(data) {
+              data = data.data
+
+              if (!data.signedRequest) {
+                return cb('Failed to receive an upload url');
+              }
+
+              file.signedRequest = data.signedRequest;
+              file.finalURL = data.downloadURL;
+              cb();
+          })
+            .catch(function() {
+              return cb('Failed to receive an upload url');
+          });
+        },
+        sending: function(file, xhr) {
+          console.log('sending')
+          var _send = xhr.send;
+          xhr.setRequestHeader('x-amz-acl', 'public-read-write');
+          xhr.send = function() {
+            _send.call(xhr, file);
+          }
+        },
+        processing:function(file){
+          this.options.url = file.signedRequest;
         }
+        // url: (data) => {
+        //   return MicroPostsService.saveImage(data[0].name, data[0])
+        // },
+        // url: '/',
+        // method: 'put',
+        // thumbnailHeight: 160,
+        // maxFilesize: 5,
+        // previewTemplate: this.dropzoneTemplate(),
+        // headers: {},
+        // accept (file, done) {
+        //   MicroPostsService.saveImage(file)
+        //     .catch((err) => {
+        //       done('Failed to get an S3 signed upload URL', err)
+        //     })
+        // }
       }
     }
   },
@@ -95,8 +152,14 @@ export default {
         `;
     },
     finished() {
-      console.log(this.name + ' - - ' + this.price);
+      // console.log(this.name + ' - - ' + this.price);
       MicroPostsService.insertMicroPost(this.name, 'TEST', this.price);
+    },
+    s3UploadError(errorMessage) {
+      console.log('ERROR' + errorMessage)
+    },
+    s3UploadSuccess(s3ObjectLocation) {
+      console.log(s3ObjectLocation)
     }
   }
 };
