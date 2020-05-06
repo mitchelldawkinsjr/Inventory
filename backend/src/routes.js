@@ -75,16 +75,6 @@ router.get('/uploader', async (req, res) => {
     ACL: 'public-read'
   };
 
-  // s3.getBucketTagging({
-  //   Bucket: 'revolution-inventory'
-  // }, function(err, data) {
-  //   if (err) {
-  //     return console.log('Error getting bucket tagging: ' + JSON.stringify(err));
-  //   }
-  //   console.log(JSON.stringify(data));
-  // });
-
-
   s3.getSignedUrl('putObject', s3_params, function(err, data){
     if(err){
       console.log(err);
@@ -99,10 +89,7 @@ router.get('/uploader', async (req, res) => {
       res.end();
     }
   });
-  // res.status(200).send();
-  // res.send(data);
 });
-
 
 async function putItem(table, item) {
   return new Promise((resolve,reject) => {
@@ -135,7 +122,6 @@ async function getAllItems (table) {
     })
   })
 }
-
 async function getAllItemsFiltered (table, column, filter) {
   return new Promise((resolve,reject) => {
 
