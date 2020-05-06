@@ -34,7 +34,7 @@
           </b-dropdown>
         </b-button-group>
       </div>
-      <add-new-modal :categories="categories" :statuses="statuses"></add-new-modal>
+      <add-new-modal :categories="categories" :conditions="conditions"></add-new-modal>
       <piaf-breadcrumb />
       <div class="mb-2 mt-2">
         <b-button
@@ -144,40 +144,64 @@ export default {
     return {
       categories: [
         {
-          label: "Cakes",
-          value: "Cakes"
+          label: "Cables",
+          value: "cables"
         },
         {
-          label: "Cupcakes",
-          value: "Cupcakes"
+          label: "Converters",
+          value: "converters"
         },
         {
-          label: "Desserts",
-          value: "Desserts"
-        }
+          label: "Cameras",
+          value: "cameras"
+        },
+        {
+          label: "Computers",
+          value: "computers"
+        },
+        {
+          label: "Adapters",
+          value: "adapters"
+        },
+        {
+          label: "Monitors",
+          value: "monitors"
+        },
+        {
+          label: "Computer accessories",
+          value: "computer-accessories"
+        },
+        {
+          label: "Camera accessories",
+          value: "camera-accessories"
+        },
+        {
+          label: "Misc Electronics",
+          value: "misc-electronics"
+        },
       ],
-      statuses: [
+      conditions: [
         {
-          text: "ON HOLD",
-          value: "ON HOLD"
+          label: "Fully Functional (Working)",
+          value: "working"
         },
         {
-          text: "PROCESSED",
-          value: "PROCESSED"
-        }
+          label: "Faulty (Broken)",
+          value: "not-working"
+        },
+        {
+          label: "Untested",
+          value: "untested"
+        },
       ],
       sortOptions: [
         {
-          column: "title",
+          column: "name",
           label: "Product Name"
         },
         {
           column: "category",
           label: "Category"
-        },
-        {
-          column: "status",
-          label: "Status"
         }
       ],
       pageSizes: [4, 8, 12]

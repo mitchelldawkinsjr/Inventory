@@ -33,7 +33,7 @@ export default {
   },
   async created () {
     try {
-      this.microPosts = await MicroPostsService.getMicroPosts()
+      this.microPosts = await MicroPostsService.getMicroPosts();
       this.calculate(this.microPosts);
     } catch (error) {
       this.error = error.message

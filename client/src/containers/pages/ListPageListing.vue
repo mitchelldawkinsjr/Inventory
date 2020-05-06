@@ -97,7 +97,6 @@ export default {
     "displayMode",
     "items",
     "selectedItems",
-    "selectedItems",
     "toggleItem",
     "lastPage",
     "perPage",

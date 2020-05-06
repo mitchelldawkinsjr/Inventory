@@ -8,6 +8,10 @@
                         <b-form-group :label="$t('forms.name')">
                             <b-form-input type="text" v-model="name" :placeholder="$t('forms.name')" />
                         </b-form-group>
+
+                      <b-form-group :label="$t('pages.category')">
+                        <v-select :options="categories" v-model="category" />
+                      </b-form-group>
                     </b-form>
                 </div>
             </tab>
@@ -28,11 +32,23 @@
             </tab>
             <tab :name="$t('wizard.step-name-3')" :desc="$t('wizard.step-desc-3')">
                 <div class="wizard-basic-step">
-                    <b-form>
-                        <b-form-group :label="$t('forms.price')">
-                            <b-form-input type="text" v-model="price" :placeholder="$t('forms.price')" />
-                        </b-form-group>
-                    </b-form>
+                  <b-form>
+                    <b-form-group :label="$t('forms.price')">
+                      <b-form-input type="text" v-model="price" :placeholder="$t('forms.price')" />
+                    </b-form-group>
+
+                    <b-form-group :label="$t('forms.quantity')">
+                      <b-form-input type="text" v-model="quantity" :placeholder="$t('forms.quantity')" />
+                    </b-form-group>
+
+                    <b-form-group :label="$t('forms.box')">
+                      <b-form-input type="text" v-model="box" :placeholder="$t('forms.box')" />
+                    </b-form-group>
+
+                    <b-form-group :label="$t('pages.category')">
+                      <v-select :options="conditions" v-model="condition" />
+                    </b-form-group>
+                  </b-form>
                 </div>
             </tab>
             <tab type="done">
@@ -53,12 +69,16 @@ import VueDropzone from "vue2-dropzone";
 import MicroPostsService from "../../utils/MicroPostsService";
 import axios from "axios";
 import {apiUrl} from "../../constants/config";
+import vSelect from "vue-select";
 
 export default {
   data() {
     return {
       name:'',
       price: '',
+      imageUrl: '',
+      quantity: '',
+      box: '',
       dropzoneOptions: {
         url:"#",
         previewTemplate: this.dropzoneTemplate(),
@@ -81,8 +101,8 @@ export default {
           };
 
           axios.get(apiUrl+'uploader', params)
-            .then(function(data) {
-              data = data.data
+            .then((data) => {
+              data = data.data;
 
               if (!data.signedRequest) {
                 return cb('Failed to receive an upload url');
@@ -96,39 +116,80 @@ export default {
               return cb('Failed to receive an upload url');
           });
         },
-        sending: function(file, xhr) {
-          console.log('sending')
+        sending: (file, xhr) => {
+          this.updateImageUrl(file);
+
           var _send = xhr.send;
-          xhr.setRequestHeader('x-amz-acl', 'public-read-write');
-          xhr.send = function() {
+          xhr.send = () => {
             _send.call(xhr, file);
-          }
+          };
         },
-        processing:function(file){
+        processing: function (file) {
           this.options.url = file.signedRequest;
         }
-        // url: (data) => {
-        //   return MicroPostsService.saveImage(data[0].name, data[0])
-        // },
-        // url: '/',
-        // method: 'put',
-        // thumbnailHeight: 160,
-        // maxFilesize: 5,
-        // previewTemplate: this.dropzoneTemplate(),
-        // headers: {},
-        // accept (file, done) {
-        //   MicroPostsService.saveImage(file)
-        //     .catch((err) => {
-        //       done('Failed to get an S3 signed upload URL', err)
-        //     })
-        // }
-      }
+      },
+      category:'',
+      condition:'',
+      props: ["categories","conditions"],
+      conditions: [
+        {
+          label: "Fully Functional (Working)",
+          value: "working"
+        },
+        {
+          label: "Faulty (Broken)",
+          value: "not-working"
+        },
+        {
+          label: "Untested",
+          value: "untested"
+        },
+      ],
+      categories: [
+        {
+          label: "Cables",
+          value: "cables"
+        },
+        {
+          label: "Converters",
+          value: "converters"
+        },
+        {
+          label: "Cameras",
+          value: "cameras"
+        },
+        {
+          label: "Computers",
+          value: "computers"
+        },
+        {
+          label: "Adapters",
+          value: "adapters"
+        },
+        {
+          label: "Monitors",
+          value: "monitors"
+        },
+        {
+          label: "Computer accessories",
+          value: "computer-accessories"
+        },
+        {
+          label: "Camera accessories",
+          value: "camera-accessories"
+        },
+        {
+          label: "Misc Electronics",
+          value: "misc-electronics"
+        },
+      ],
     }
   },
   components: {
       "form-wizard": FormWizard,
       "tab": Tab,
-      "vue-dropzone": VueDropzone
+      "vue-dropzone": VueDropzone,
+      "v-select": vSelect
   },
   methods: {
     dropzoneTemplate() {
@@ -151,16 +212,20 @@ export default {
                 </div>
         `;
     },
+    updateImageUrl(file) {
+      this.imageUrl = file.finalURL;
+    },
     finished() {
-      // console.log(this.name + ' - - ' + this.price);
-      MicroPostsService.insertMicroPost(this.name, 'TEST', this.price);
+      MicroPostsService.insertMicroPost(
+        this.name,
+        this.imageUrl,
+        this.price,
+        this.quantity,
+        this.box,
+        this.category.value,
+        this.condition.value,
+      );
     },
-    s3UploadError(errorMessage) {
-      console.log('ERROR' + errorMessage)
-    },
-    s3UploadSuccess(s3ObjectLocation) {
-      console.log(s3ObjectLocation)
-    }
   }
 };
 </script>

@@ -172,6 +172,7 @@
   },
   "pages": {
     "add-new": "ADD NEW",
+    "condition": "Condition",
     "image": "Image",
     "add-new-modal-title": "Add New Item",
     "display-options": "Display Options",
@@ -430,6 +431,8 @@
   "forms": {
     "basic": "Basic",
     "price": "Price",
+    "box": "Storage Box Label",
+    "quantity": "Quantity",
     "email": "E-mail",
     "email-muted": "We'll never share your email with anyone else.",
     "password": "Password",
@@ -478,6 +481,7 @@
 
   },
   "form-components": {
+    "image-upload": "Image Upload",
     "custom-inputs": "Custom Inputs",
     "checkboxes": "Checkboxes",
     "radios": "Radios",
@@ -615,10 +619,10 @@
   "wizard":{
     "step-name-1": "Name",
     "step-name-2": "Image",
-    "step-name-3": "Price",
+    "step-name-3": "Details",
     "step-desc-1": "Add the name of the item",
     "step-desc-2": "Add an image of the item",
-    "step-desc-3": "Add researched price of the item",
+    "step-desc-3": "Add researched details for the item",
     "content-1": "Step content for first step.",
     "content-2": "Step content for second step.",
     "content-3": "Last step content!",

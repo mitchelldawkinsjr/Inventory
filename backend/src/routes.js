@@ -2,7 +2,12 @@ const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
 const router = express.Router();
 const AWS = require('aws-sdk');
-AWS.config.update({ region: 'us-east-1'})
+
+AWS.config.update({
+  region: 'us-east-1',
+  signatureVersion: 'v4'
+});
+
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
 const Crypto = require("crypto");
@@ -15,26 +20,46 @@ router.get('/', async (req, res) => {
   res.send(data);
 });
 
+router.get('/filtered', async (req, res) => {
+  // const collection = await loadMicroPostsCollection();
+  const data = await getAllItemsFiltered('inventory', req.body.column, req.body.filter);
+  console.log(data);
+  res.send(data);
+});
+
 // insert a micro-post
 router.post('/', async (req, res) => {
-  let date = new Date().toDateString();
+  let d = new Date().toDateString();
+
+  // let dateExt = d.getFullYear() + '/0' + d.getMonth() + '/0' + d.getDay() +'T'+ d.getHours()+ ':' + d.getMinutes() +':'+ d.getSeconds();
+
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 
   const item = {
-    id: 'INV_' + Math.random(),
+    id: 'INV_' + uuidv4(),
     name: req.body.name,
     image: req.body.image,
     price: req.body.price,
-    createdAt: date,
-  }
+    quantity: req.body.quantity,
+    box: req.body.box,
+    category: req.body.category,
+    condition: req.body.condition,
+    createdAt: d,
+  };
   await putItem('inventory', item);
   res.status(200).send();
-})
+});
 
 // insert a image
 router.put('/', async (req, res) => {
-  await saveImg(req.body.name, req.body.data)
+  await saveImg(req.body.name, req.body.data);
   res.status(200).send();
-})
+});
 
 router.get('/uploader', async (req, res) => {
   var fileId = Crypto.randomBytes(20).toString('hex').toUpperCase();
@@ -47,8 +72,19 @@ router.get('/uploader', async (req, res) => {
     Key: newFileName,
     Expires: 60,
     ContentType: req.query.fileType,
-    ACL: 'public-read-write'
+    ACL: 'public-read'
   };
+
+  // s3.getBucketTagging({
+  //   Bucket: 'revolution-inventory'
+  // }, function(err, data) {
+  //   if (err) {
+  //     return console.log('Error getting bucket tagging: ' + JSON.stringify(err));
+  //   }
+  //   console.log(JSON.stringify(data));
+  // });
+
+
   s3.getSignedUrl('putObject', s3_params, function(err, data){
     if(err){
       console.log(err);
@@ -73,7 +109,7 @@ async function putItem(table, item) {
     const params = {
       TableName: table,
       Item:item
-    }
+    };
 
     dynamodb.put(params, (err, data) => {
       if (err) {
@@ -88,7 +124,26 @@ async function getAllItems (table) {
   return new Promise((resolve,reject) => {
     const params = {
       TableName: table
-    }
+    };
+
+    dynamodb.scan(params, (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data.Items)
+      }
+    })
+  })
+}
+
+async function getAllItemsFiltered (table, column, filter) {
+  return new Promise((resolve,reject) => {
+
+    const params = {
+      TableName : table,
+      FilterExpression : column + ' = :this_val',
+      ExpressionAttributeValues : {':this_val' : filter}
+    };
 
     dynamodb.scan(params, (err, data) => {
       if (err) {
@@ -106,7 +161,7 @@ async function getItem (table, idkey) {
       Key: {
         [idkey]: id
       }
-    }
+    };
 
     dynamodb.get(params, (err, data) => {
       if (err) {
@@ -125,7 +180,7 @@ async function saveImg (name, data) {
       Body: Buffer.from(data.dataURL, 'base64'),
       ContentEncoding: 'base64',
       ContentType: 'image/png'
-    }
+    };
     s3.putObject(params, (err,data) => {
       if (err) {
         reject(err)

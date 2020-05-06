@@ -20,11 +20,23 @@ class MicroPostsService {
     })
   }
 
-  static insertMicroPost (name, image, price) {
+  static insertMicroPost (
+    name,
+    image,
+    price,
+    quantity,
+    box,
+    category,
+    condition,
+  ) {
     return axios.post(url, {
       name,
       image,
-      price
+      price,
+      quantity,
+      box,
+      category,
+      condition,
     })
   }
 
@@ -33,14 +45,14 @@ class MicroPostsService {
     let params = {
       name: file.name,
       data: file.dataURL
-    }
+    };
     console.log(params);
 
     return axios.put(url, params)
       .then(response => {
         console.log(response);
       })
-      .catch(error => {
+      .catch(err => {
         console.log(err);
       });
 
